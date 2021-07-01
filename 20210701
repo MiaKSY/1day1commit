@@ -1,0 +1,75 @@
+- jsp + jdbc
+(절차를 숙지하자!)
+기본 준비물이 필요하다.
+1.  java
+2.  db (oracle, mariadb, mysql 등)
+3. 자바가 오라클을 인식하기 위해! 
+(장치를 인식하기 위한 프로그램 : 드라이버)
+  오라클 드라이버가 필요하다. (오라클 회사에서 만들었다.)
+  mariadb 드라이버가 필요하다. (mariadb 회사에서 만들었다.)
+
+오라클이 깔린 경로찾아서 ojdbc6.jar찾기.
+
+C:\Program Files\Java\jre1.8.0_91\lib\ext
+에 
+ojdbc6.jar
+mysql-connector-java-8.0.24.jar
+를 더해준다.
+
+드라이버는 프로그램이고, 작동되기 위해서는 메모리에 올라와 있어야 한다.
+
+드라이버가 메모리에 올라온다. => 로딩
+1. 메모리에 로딩
+
+자바와 오라클이 연결되기 위한 통신. 소캣 통신, 가상통로(커넥션, 연결객체)필요
+2. connection 연결
+
+3. 자바에서 SQL문장 작성
+
+자바가 가지고 있는 sql문장을 oracle로 보내야한다.
+4. 전송객체가 필요하다.
+
+5. SQL문을 전송객체에 싣는다.
+
+6. SQL을 오라클로 보낸다.
+
+7. 오라클이 SQL문장을 실행하고
+
+8. 그걸 다시 자바로 보내준다.
+
+
+
+[ jdbc 연동 절차 ]
+
+1. 드라이버를 메모리에 로딩
+	Class.forName("oracle.jdbc.driver.OracleDriver")
+	Class.forName("org.gjt.mm.mysql.Driver")
+
+2. 연결객체 얻어오기
+	(변수 데려오기)
+				내 아이피주소 : 포트번호
+	String url ="jdbc:oracle:thin:@127.0.0.1:1521:xe";
+	String user="HR";
+	String pass="1234";
+
+	Connection con = DriverManager.getConnection(url, user, pass);
+3. SQL문 작성하기
+4. SQL 전송객체(3가지 종류) 얻어오기
+	- Statement
+	- PreparedStatement (**90%이상 이것만 쓴다.)
+	- CallStatement (오라클에서 미리 PLSQL로 만들어놓은 함수를 불러온다.)
+5. 전송 (헷갈리면 안된다.)
+	- ResultSet excuteQuery( )	: SELECT문으로 작성 (리턴값 : )
+	- int excuteUpdate( )	: INSERT / UPDATE / DELETE문으로 작성 (리턴값int유형으로 결과가 나온다.)
+6. [결과처리]
+7. 연결객체를 닫아준다.
+	close( )
+
+
+
+로컬 디비 말고!
+서버를 다른 곳에 두자!
+
+리눅스 서버, 아마존 혹은 구글에다가 .. 데이터베이스 설치
+
+찾아봅시다
