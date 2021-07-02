@@ -10,6 +10,12 @@
 
 오라클이 깔린 경로찾아서 ojdbc6.jar찾기.
 
+오라클이 깔린 경로에서
+C:\oraclexe\app\oracle\product\11.2.0\server\jdbc\lib
+에 들어가
+ojdbc6.jar
+를 복사한다.
+
 C:\Program Files\Java\jre1.8.0_91\lib\ext
 에 
 ojdbc6.jar
