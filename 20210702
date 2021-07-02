@@ -1,0 +1,82 @@
+● 파일형식
+
+JSP에서는 :	contentType 이라고 부르고
+웹에서는  :	MIME 타입 이라고 부른다.
+  
+  
+● MIME 타입 변경하기
+
+1. request의 객체를 통해 type 이름의 값을 넘겨받는다
+2. null 이라면 html파일 형식으로 기술
+3. excel이라면 excel파일 형식으로 기술
+4. word   라면 word파일 형식으로 기술
+	
+String type = request.getParameter("type");
+
+if( type != null ){
+  if( type.equals("word") ){
+    response.setContentType("application/msword");
+  } else if(type.equals("excel")){
+    response.setContentType("application/vnd.ms-excel");			
+  }
+}
+	
+  
+● Body.jsp 에서 헤더와 푸터 가져오기
+
+<%@ include file="header.jsp" %>
+<%@ include file="footer.jsp" %>
+
+
+● 폼의 입력값 받아와서 출력하기 (기본)
+
+String name = request.getParameter("User");
+String pass = request.getParameter("Pass");
+아이디 : <%=name %>
+패스워드 : <%=pass %>
+
+
+● 폼의 입력값 받아와서 출력하기 (체크박스 - 여러개 가져오기)
+
+String[] hobby = request.getParameterValues("hobby");
+취미 : <% for(int i = 0 ; hobby != null && i < hobby.length ; i++){
+  		  out.println(hobby[i] + "&nbsp;");
+		  } %>
+
+
+● 리다이렉트 페이지 이동
+
+<% response.sendRedirect("to_move_page.jsp"); %>
+
+
+● 클라이언트와 서버
+
+클라이언트  ----- request ---->  서버
+클라이언트  <---- responset ---  서버
+
+요청정보 프로토콜 = <%= request.getProtocol() %> <br>
+요청정보 전송방식 = <%= request.getMethod() %> <br>
+요청 URI = <%= request.getRequestURI() %> <br>
+컨텍스트 경로 = <%= request.getContextPath() %> <br>
+서버이름 = <%= request.getServerName() %> <br>
+서버포트 = <%= request.getServerPort() %> <br>
+
+● 쿠키값 얻어오고 출력하기
+
+1. 클라이언트로부터 Cookie를 얻어옴 
+	Cookie all[]=request.getCookies();
+
+2. 얻어온 쿠키의 이름과 값을 출력
+	for(int i=0; all !=null && i<all.length;i++){
+		out.println((i+1)+"-->"+all[i].getName()+ ":" +all[i].getValue()+"<br>");
+	}
+  
+  
+● 세션에 변수를 저장하고, 값 가져오기
+
+1. 세션에 "id"라는 이름에 변수 user 값을 저장
+  session.setAttribute("id", user);
+  
+2."id"로 저장된 세션값을 얻어온다
+( session은 무조건 Object로만 받을 수 있습니다. )
+    Object obj = session.getAttribute("id");
