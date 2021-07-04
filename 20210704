@@ -347,3 +347,5 @@ Defines an embedded applet
 <embed> 외부 (HTML이 아닌) 응용 프로그램에 대한 컨테이너를 정의합니다.
 <object> 포함 된 개체를 정의합니다.
 <param> 개체에 대한 매개 변수를 정의합니다. 
+
+출처 : w3school
