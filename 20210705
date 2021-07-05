@@ -1,0 +1,69 @@
+= 액션태그 =
+ 액션태그는 xml 문법을 따른다.
+
+자바 빈즈 관련
+<jsp:useBean>
+<jsp:setProperty>
+<jsp:getProperty> : 잘 쓰지 않는다. 왜? 길어서!
+기타
+<jsp:include>는 <%@include ~~%>와 유사하다.
+<jsp:forward>와 response.sendRedirect()의 차이점을 잘 알아두어야 한다.
+<jsp:param>는 태그의 사이에 ex)<jsp:include>  <jsp:param/>  </jsp:include>
+
+
+● 페이지 삽입
+    예전방법 : 정적페이지 삽입
+    정적페이지 : 그대로 페이지에 박아버리는 형식
+<%@ include file="01_header.jsp" %>
+  새로운방법 : 동적페이지 삽입
+  동적페이지 : 함수형식? 그런 느낌으로 되어있다.
+<jsp:include page="01_footer.jsp"></jsp:include>
+
+
+● 페이지 이동 ( 아주 중요! 리아디렉트와 포워딩은 다르다. )
+    예전방식
+    1) 리다이렉트
+    url과 내용이 같다.
+    request 자체가 두번인 방법
+<% response.sendRedirect("02_forwardSecond.jsp"); %> 
+    클라이언트 -----fisrt----▶ 서버
+						   ◀-----------
+    클라이언트 ---------------▶ 서버								
+					   	◀---second---- 
+    
+    새로운 방식
+    2) 포워딩
+    url과 내용이 다르다.
+    서버단에서 바꿔준다. 보안에 아주 좋다. url 하나 노출되는 것이 보안에 아주 치명적
+<jsp:forward page="02_forwardSecond.jsp"></jsp:forward>
+    클라이언트 -----fisrt----▶ 서버
+										           |
+									             ▼
+		클라이언트 ◀----second---- 서버								
+
+
+● 자바빈즈관련
+    빈즈 가져오고 지정하기
+<jsp:useBean id="bean" class='info.beans.InfoBean'>
+	<jsp:setProperty name='bean' property='*'></jsp:setProperty>
+</jsp:useBean>
+    출력
+<%=bean.getName() %>
+<jsp:getProperty property="name" name="bean"/>
+
+
+= java와 db연결 중 commit에 대하여 =
+
+sql developer 내부에서 insert~ 작업중일때, commit;을 하지 않은 상태에서,
+외부 java에서 insert를 하면, 아직 내부 insert 작업이 끝나지 않은 상태이기 때문에
+java쪽에서 날라오는 애들을 blocking 해버린다.
+(외부에서 날라올 때는 auto commit이 된다!)
+그러니까 sql과 java에서 db연동을 같이 해줄때는
+꼭 커밋을 해주자!  
+
+= MVC 모델 =
+= view와 model을 완벽하게 분리해주세요 =
+view : 화면 (JSP)
+beans : view와 model 사이
+service : 화면도 아니고 모델도 아닌 것. 미리 만든 파일을 건들지 않기 위해서, 확장성 때문에 만든다.
+model : 데이터베이스 연동 (DAO)
