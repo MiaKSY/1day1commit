@@ -1,0 +1,20 @@
+[ 20210709 ]
+[ 자바 - DB 연동 (MariaDB)]
+
+(기본적으로 오라클DB와 자바가 연결이 되어있는 상태이고, 현재 프로젝트 필요에 의해서 MariaDB를 사용하게 되었다.)
+(db연동을 복습하는 시간을 가졌다.)
+
+[ 1 ]
+- mySQL 과 mariaDB 는 같은 계열이고, 포트번호가 3306으로 같다.
+- mariaDB를 설치하기 전에 mySQL를 삭제해주었다.
+
+[ 2 ]
+- mariaDB설치 : mariadb-10.6.3-winx64.msi 를 설치해주었다.
+
+[ 3 ]
+ - 드라이버(커넥터) 설치 : mariadb-java-client-2.7.3.jar 를 설치해주었다.
+ - 자바가 깔린 경로를 찾아 jdk, jre 의 lib 안에 각각 복사해서 넣어주었다.
+
+
+
+(참고 : https://shxrecord.tistory.com/157)
