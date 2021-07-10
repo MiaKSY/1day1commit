@@ -12,8 +12,18 @@
 - mariaDB설치 : mariadb-10.6.3-winx64.msi 를 설치해주었다.
 
 [ 3 ]
- - 드라이버(커넥터) 설치 : mariadb-java-client-2.7.3.jar 를 설치해주었다.
+ - 드라이버(커넥터) 설치 : mariadb-java-client-2.7.3.jar 를 설치해주었다. 
  - 자바가 깔린 경로를 찾아 jdk, jre 의 lib 안에 각각 복사해서 넣어주었다.
+
+[ 이클립스 ]
+mariaDB연동을 하려는 Dynamic Web Project에 Build Path설정으로 들어가서 
+Libraries - Add External Jars... 를 눌러 jar 파일을 추가해주었다.
+
+나머지는 자바 DAO파일에서 드라이버, url, 유저이름과 비밀번호값만 수정해주면 된다.
+
+여담)
+오라클 SQL에서는 시퀀스를 따로 만들어서 적용해주어야 했지만, 
+mariaDB에서는 시퀀스가 자동으로 편리하게 되어있다.
 
 
 
