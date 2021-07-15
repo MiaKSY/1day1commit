@@ -1,0 +1,80 @@
+[ 20210715 ]
+
+스프링을 공부한 세번째 날이다.
+
+오늘은 스프링으로 자바와 DB를 연동해보았다.
+
+스프링을 사용해보니, 페이지와 페이지의 연결, DB 연동 등.... 전부 너무너무 간편히고 편리했다.
+
+아직 완전히 익숙하지는 않지만, 개발 속도가 확연히 단축될 것 같다.
+
+========================================================
+
+우선, 우리는 현재 Spring MVC Project가 있는 STS3 버전을 쓰고있다. 
+Spring Regacy Project - Spring MVC Project로 프로젝트를 생성하고
+톰캣 등 서버를 맞춰주고
+pom.xml에 우리가 원하는 dependency, plugin등을 추가해주고
+우리는 오라클 DB를 쓰니까, JRE System Library에 ojdbc6.jar 파일과 Maven Dependencies에 mybatis관련 jar등이 있는지 확인합니다.
+오라클에 가서 테이블을 생성해 준 후, 
+src - main - webapp - WEB-INF - spring - root-context.xml 에서 DB와 연동하는 계정정보를 맞춰줍니다.
+src/main/java에서 mybatis-config.xml에서 별칭을 지정합니다.
+
+DAO 에서는 위에 @Repository
+Service에서는 위에 @Service
+Controller에서는 위에 @Controller
+그리고 각 메소드에서는 위에 @RequestMappting() 해줍니다.
+
+
+========================================================
+
+
+	//***********************************************
+	// ▼ DB 데이터를 가져오기!!!
+	//***********************************************
+	// @RequestMapping("getBoardList.do")
+	// ▲ 슬래시 있고 없고 현재는 상관없다. ▼
+	@RequestMapping("/getBoardList.do")
+	public void getBoardList(Model m) {
+		m.addAttribute("boardList", boardService.getBoardList());
+	}
+  
+	//***********************************************
+	// ▼ DB에 입력시키고!!!! 목록으로 가져오기!!!
+	//***********************************************
+	@RequestMapping("saveBoard.do")
+	public String saveBoard(BoardVO vo) {
+		boardService.insertBoard(vo);
+		return "redirect:getBoardList.do";
+	}
+  
+  //***********************************************
+	// ▼ 이것이 가장 어려움!!!
+	//***********************************************
+	//***********************************************
+	// ▼ DB 데이터를 가져오기!!!
+	//***********************************************
+	@RequestMapping("getBoard.do")
+	  public void getBoard(Model m, BoardVO vo) {
+       m.addAttribute("board", boardService.getBoard(vo));
+    }
+    
+  //***********************************************
+	// ▼ DB에 삭제시키고!!!! 목록으로 가져오기!!!
+	//***********************************************	
+	@RequestMapping("deleteBoard.do")
+	public String deleteBoard(BoardVO vo) {
+		boardService.deleteBoard(vo);
+		return "redirect:getBoardList.do";
+	}
+	
+	//***********************************************
+	// ▼ DB에 수정시키고!!!! 목록으로 가져오기!!!
+	//***********************************************
+	@RequestMapping("updateBoard.do")
+	public String updateBoard(BoardVO vo) {
+		boardService.updateBoard(vo);
+		return "redirect:getBoardList.do";
+	}
+
+	
+  
