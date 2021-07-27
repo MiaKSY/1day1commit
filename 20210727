@@ -1,0 +1,12 @@
+-- spring MVC 패턴, 
+
+-- Controller에서 return 할 때 redirect가 있는 것과의 차이
+
+
+return "select.do"
+단순 페이지 이동 요청.
+select.jsp 파일로 이동한다.
+
+return "redirect:select.do";
+사용자의 요청을 바꿔버린다.
+Controller에서 @RequestMapping("select.do") 를 찾아간다.
