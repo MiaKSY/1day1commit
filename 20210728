@@ -1,0 +1,83 @@
+프로젝트에서 마이페이지를 구현하는 중, 실시간으로 시간이 나오게 구현하고 싶어서 구글링을 해봤다.
+
+(참고 : https://cocoon1787.tistory.com/539)
+
+스크립트 부분의 코드만 보자면 아래와 같다.
+
+
+
+    <script>
+        var Target = document.getElementById("clock");
+        var Target_apm = document.getElementById("apm");
+        function clock() {
+            var time = new Date();
+            var hours = time.getHours();
+            var minutes = time.getMinutes();
+            var seconds = time.getSeconds();
+            var AmPm ="AM";
+            if(hours > 12){   
+                var AmPm ="PM";
+                hours %= 12;
+            }
+
+            Target.innerText = 
+            `${hours < 10 ? `0${hours}` : hours}:${minutes < 10 ? `0${minutes}` : minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
+
+            Target_apm.innerText = `${AmPm}`;
+
+        }
+        clock();
+        setInterval(clock, 1000); // 1초마다 실행
+    </script>
+    
+    
+    
+적용을 해보려고 하니 계속 적용되지 않았다.
+여러가지로 조금씩 바꿔보고 해보다가 일단 보류하고 다른 부분 구현을 먼저 했다.
+조금 쉬고 다시 실시간 시간을 구현해보는데,
+
+갑자기 뭔가 머릿속에 번뜩이며
+VISUAL STUDIO CODE를 켜서 그 안에 HTML파일을 만들고, 코드를 실행시켜보았다.
+잘 되었다...!!
+
+흠.. 코드 자체에 문제는 없고, 읽어들이는 어딘가에서 뭔가 문제가 있군, 싶어서
+다시 SPRING TOOL SUITE로 돌아와서
+이리저리 만져보다가ㅋㅋㅋ
+결국엔 실행이 되었다.
+
+실행 된 코드는 아래와 같다.
+
+
+
+    <script type="text/javascript">
+	  // 실시간 시간
+	
+        var Target = document.getElementById("clock");
+        var Target_apm = document.getElementById("apm");
+        function clock() {
+            var time = new Date();
+            var hours = time.getHours();
+            var minutes = time.getMinutes();
+            var seconds = time.getSeconds();
+            var AmPm ="AM";
+            if(hours > 12){   
+                var AmPm ="PM";
+                hours %= 12;
+            }
+
+
+            Target.innerText = hours + ':' + minutes + ':' + seconds;
+
+            Target_apm.innerText = AmPm;
+
+        }
+        clock();
+        setInterval(clock, 1000); // 1초마다 실행
+    
+    </script>
+    
+    
+    
+차이는, 변수를 불러오는 부분을 위에서는 `${AmPm}` 이렇게 받았다면, 아래에서는 AmPm 으로 받았다.
+너무.. 기쁘고 행복하다ㅎㅎ
+오늘도 또 발전했다.
