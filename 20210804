@@ -1,0 +1,11 @@
+[ 리눅스 기초 명령어 ]
+
+- 목록보기 : ls
+- 작업 디렉토리 변경 (change directory) : cd
+- 파일 복사 (copy) / 이동 (move) : cp / mv
+- 파일 삭제 (remove) : rm
+- 디렉토리 만들기 (make directory) : mkdir 
+- 파일의 내용 보기 : cat / text
+- 파일이나 디렉토리 찾기 : find
+- 전부 지우기 : clear
+- 내가 작성했던 명령어 보기 : history
