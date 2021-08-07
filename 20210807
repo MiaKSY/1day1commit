@@ -1,0 +1,22 @@
+[ 리눅스 - vi editor ]
+
+vi editor
+
+===== ▼ 터미널에서 ▼ =====
+vi 이름.txt		: vi 파일 생성 / 열기
+fg			      : 실수해서 ctrl+z를 눌러서 빠져나와버렸을 때
+
+===== ▼ vi 파일에서 ▼ =====
+esc i			    : 작성
+esc :set nu		: 행 번호 토굴
+yy		      	: 복사 
+p			        : 붙이기 
+esc dd			  : 한 행 지우기
+esc :행번호    : 원하는 행으로 이동
+esc /단어			: 원하는 단어로 이동
+ctrl+H		  	: 맨 위로 가기
+ctrl+G		  	: 맨 아래로 가기
+:wq			      : 저장하고 나가기
+esc : %s/A/B/g : A를 B로 변경
+
+ctrl+q			   : 실수해서 ctrl+s를 눌러서 화면이 멈추어버렸을 때
