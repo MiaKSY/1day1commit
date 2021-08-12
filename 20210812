@@ -1,0 +1,246 @@
+[ 분산환경 구축 ]
+
+# -----------------------------------------
+0. Vitural Box 설치
+# -----------------------------------------
+https://www.virtualbox.org/ 접속
+왼쪽 Download 클릭 
+아래 Vitural Box Old builds 클릭
+VirtualBox 6.0 클릭
+VirtualBox 6.0.24에서 Windows hosts 클릭해서 다운
+VirtualBox-6.0.24-139119-Win.exe 다운되면 그대로 실행
+전체 다 Next~ 하고 Install
+설치 완료!
+
+우리가 VM웨어에 리눅스를 깐 것 처럼, 
+VM Vitural Box 에 서버를 세개를 만들거다.
+Vagrant(베이그랜트) 를 이용해서!
+
+
+# -----------------------------------------
+1. Vagrant(베이그랜트) 다운로드 
+# -----------------------------------------
+https://www.vagrantup.com/ 접속
+download 클릭
+그냥 최신버전 다운로드
+64-bit
+vagrant_2.2.18_x86_64.msi 다운되면 그대로 실행
+전체 다 Next~ 하고 Install
+설치완료!
+
+하고 컴퓨터 재부팅
+하면
+C:\HashiCorp\Vagrant
+되어있음~!
+
+
+# -----------------------------------------
+시작에서 cmd를 관리자모드 실행 하고
+
+디렉토리 변경하고
+cd C:\HashiCorp
+
+이렇게 작성하고
+C:\HashiCorp> vagrant init
+조금 기다리면 된다.
+
+# -----------------------------------------
+탐색기 C:\HashiCorp 에 Vagrantfile 이 생성되어있다
+그거를 메모장으로 열고, 내용을 전부 지운다.
+그리고
+아래를 복사
+======
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+    config.ssh.insert_key = false
+    config.vm.define :nn01 do |nn01_config|
+        nn01_config.vm.box = "centos/7"
+        nn01_config.vm.hostname = "nn01"
+        nn01_config.vm.network "private_network", ip: "192.168.56.101"
+        nn01_config.vm.provider :virtualbox do |vb|
+            vb.name = "nn01"
+            vb.memory = "4096"
+        end
+
+    end
+
+    config.vm.define :dn01 do |dn01_config|
+        dn01_config.vm.box = "centos/7"
+        dn01_config.vm.hostname = "dn01"
+        dn01_config.vm.network "private_network", ip: "192.168.56.102"
+        dn01_config.vm.provider :virtualbox do |vb|
+            vb.name = "dn01"
+            vb.memory = "4096"
+        end
+    end
+
+
+
+    config.vm.define :dn02 do |dn02_config|
+        dn02_config.vm.box = "centos/7"
+        dn02_config.vm.hostname = "dn02"
+        dn02_config.vm.network "private_network", ip: "192.168.56.103"
+        dn02_config.vm.provider :virtualbox do |vb|
+            vb.name = "dn02"
+            vb.memory = "4096"
+        end
+    end
+
+
+end
+======
+위를 복사
+
+nn01 을 이름으로 centos/7 을 깔거고, 메모리는 4096 (4기가) 입니다. 네트워크는 ip: "192.168.56.101" 이렇게 쓸겁니다. 
+라는 느낌들의 내용! 이 3개 있다.
+
+4기가짜리 3개를 만드는 거에요.
+
+하고 내용 복사 붙여넣기가 잘 되었으면 닫아주세요~
+
+# -----------------------------------------
+그리고 다시 아까 그 cmd 에서
+
+C:\HashiCorp>vagrant up 
+
+해주세요
+
+그러고 기다리면 됩니다!
+시간 좀 걸려요!
+
+다 되면 
+
+# -----------------------------------------
+Oracle VM VirtualBox 를 들어가보면
+
+짜잔!
+장치가 세개가 되어있다.
+
+# -----------------------------------------
+탐색기에서는
+C:\Users\kosmo\VirtualBox VMs
+에 들어가있고
+C:\HashiCorp\.vagrant\machines
+에도 들어가있다.
+
+# -----------------------------------------
+Oracle VM VirtualBox 를 관리자모드로 들어갑니다. 
+
+상단 바 - 파일 - 환경설정 - 입력 - 가상머신
+호스트 키 조합 Right Control 을 지우고 Ctrl + Alt 로 해주세여
+
+nn01
+dn01
+dn02
+각각 더블클릭!
+
+화면에 엔터를 치고
+login : 
+root/vagrant
+vagrant/vagrant 
+
+ip addr 로 IP 확인
+
+nn01 : 192.168.56.101
+dn01 : 192.168.56.102
+dn02 : 192.168.56.103
+
+
+# -----------------------------------------
+2. PuTTY 다운로드 
+# -----------------------------------------
+https://putty.ko.softonic.com/ 접속
+Download 클릭 
+putty-0.75-installer.msi 다운되면 그대로 실행
+전체 다 Next~ 하고 Install
+설치 완료!
+
+# -----------------------------------------
+시작에서 PuTTY 클릭!
+
+Port는 22
+
+192.168.56.101 입력
+nn01 입력
+Save 클릭
+
+192.168.56.102 입력
+dn01 입력
+Save 클릭
+
+192.168.56.103 입력
+dn02 입력
+Save 클릭
+
+Open 누르면 현재는 에러! 
+
+# -----------------------------------------
+Oracle VM VirtualBox  에서
+
+[root@nn01 ~]vi /etc/ssh/sshd_config
+[root@dn01 ~]vi /etc/ssh/sshd_config
+[root@dn02 ~]vi /etc/ssh/sshd_config
+각자!
+
+esc :set nu	: 행번호 토굴
+esc /Password	: 특정 단어 검색
+esc i		: 입력
+(65행) PasswordAuthentication no를 PasswordAuthentication yes로 변경한다. 
+esc :wq		: 나가기
+
+( 설정을 수정하면 항상 다시 들어가서 확인하기 )
+
+[root@nn01 ~]systemctl restart sshd
+[root@dn01 ~]systemctl restart sshd
+[root@dn02 ~]systemctl restart sshd
+각자!
+이것까지!
+
+하고 
+
+# -----------------------------------------
+PuTTY 에서 nn01 찾아서 Open 하고 accept
+PuTTY 에서 dn01 찾아서 Open 하고 accept
+PuTTY 에서 dn02 찾아서 Open 하고 accept
+
+접속이 잘 되는지 확인!
+
+
+# -----------------------------------------
+3. WinSCP 다운로드
+# -----------------------------------------
+https://winscp.net/eng/download.php 접속
+WinSCP-5.19.2-Setup.exe 다운
+하면서 putty 얘네들 오케오케 해준다.
+일단 당장 사용하지는 않을거지만, 앞으로 필요할거라서 미리 다운 받았으
+
+
+# -----------------------------------------
+4. MobaXterm 다운로드
+# -----------------------------------------
+https://mobaxterm.mobatek.net 접속
+상단에 Download
+파란색 Portable 로 다운로드
+압축 풀면 바로 exe 파일이 나오는데! 
+우리 앞으로 맨날 이거 쓸 거니까 바탕화면에 넣어둔다.
+
+접속하면 우리가 putty 에 만들어놓은 nn01 dn01 dn02 이 있는게 보인다!
+상단에! Multi-execution 누르면 세개 동시에 컨트롤 가능!
+우와우!
+프로그램 업데이트 하나하고
+yum update 
+프로그램 설치 하나 하고
+yum install telnet svn git nc ntp wget vim net-tools
+방화벽 두개 끕니다!
+systemctl stop firewalld
+systemctl disable firewalld
+대박 짱!ㅋㅋ
+
+
+# -----------------------------------------
+# 주의!
+# -----------------------------------------
+MobaXterm 으로 하는 중에
+Oracle VM VirtualBox 가 꼭 켜져있었어야 합니다!
