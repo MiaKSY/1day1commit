@@ -1,0 +1,810 @@
+[ 20210818 ]
+[ 하둡설치 ]
+
+======================
+===========
+설치
+===========
+======================
+
+자바를 먼저 깔아야, 하둡이 깔린다.
+하둡이 자바로 만들어져 있기 때문에, 자바가 있어야 한다.
+
+
+Oracle VM VirtualBox 에서 nn01, dn01 , dn02를 실행시키고
+MobaXterm 에서 Multi-execution mode 시작
+
+which java	: 자바가 깔렸는지 확인
+자바가 깔려있지 않다.
+
+======================
+1. protobuf 설치 (필수는 아니다)
+======================
+
+(1)설치전 필요 툴 ( root 계정에서 )
+yum install -y autoconf automake libtool curl gcc-c++ unzip
+
+​
+(2) 다운로드 ( 책마다 버전이 중요하다고 강조하는데 )
+
+경로이동
+cd /tmp
+
+wget 이용해서 알아서 다운로드
+wget https://github.com/protocolbuffers/protobuf/releases/download/v2.5.0/protobuf-2.5.0.tar.gz
+
+압축 풀기
+tar -zxvf protobuf-2.5.0.tar.gz
+
+이동시키기
+mv protobuf-2.5.0 /opt/
+
+이동되었는지 확인
+ls /opt
+
+(3) 설치 ( protobuf 폴더로 이동 )
+
+경로이동
+cd /opt/protobuf-2.5.0/
+
+경로 확인
+pwd
+
+
+현재 디렉토리 안에 있는 configure 파일 실행시키기
+./configure
+
+
+make
+하고나서 하~~~안 참 걸린다.
+
+다 되면 설치
+make install
+
+
+(4)확인
+
+protoc --version
+세군데 모두 libprotoc 2.5.0 이라고 나온다~!
+
+
+▼▼ 여기서부터 중요▼▼
+======================
+2. JDK 8 설치 (nn01,dn01,dn02)
+======================
+
+경로 이동
+cd /tmp
+
+이거 예전에 이미 해놔서.. 안 해도 된다.
+yum install -y vim wget unzip
+	  -y : yes 안 눌러도 되게 하는 옵션
+
+JDK 다운로드
+wget --no-check-certificate --no-cookies - --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.tar.gz
+(혹!시!나! 이게 안 된다면, 윈도우에서 리눅스용을 다운 받은 다음에, winSCP로 옮겨준다.)
+
+잘 받아졌는지 확인
+ls
+
+잘 받아졌는지 확인
+ls jdk*
+
+압축 풀기
+tar -xvzpf jdk-8u131-linux-x64.tar.gz
+
+압축 풀린 것 확인
+ls
+
+폴더 여러개 한번에 만들기
+mkdir -p /opt/jdk/1.8.0_131
+
+현재 디렉토리에서 모든 것을 이동시키기
+mv jdk1.8.0_131/* /opt/jdk/1.8.0_131/
+
+잘 이동되었는지 확인
+ls /opt/jdk/1.8.0_131/
+
+심볼릭 링크 생성
+ln -s /opt/jdk/1.8.0_131 /opt/jdk/current
+
+심볼릭 링크가 잘 생성되었나 확인
+ls /opt/jdk
+
+권한까지 확인
+ll /opt/jdk
+
+아래는 에러 뜸
+install java with alternatives 
+
+이것을 이용해야함
+alternatives --install /usr/bin/java java /opt/jdk/1.8.0_131/bin/java 2
+
+이거 하면
+alternatives --config java
+자바 중에서 어떤거 할래요 라고 물어보는데 우리는 어차피 하나밖에 없다.
+1 하고 엔터
+
+아래 이거 네개 하나씩 쭈루룩 해준다.
+alternatives --install /usr/bin/jar jar /opt/jdk/1.8.0_131/bin/jar 2
+alternatives --install /usr/bin/javac javac /opt/jdk/1.8.0_131/bin/javac 2
+alternatives --set jar /opt/jdk/1.8.0_131/bin/jar
+alternatives --set javac /opt/jdk/1.8.0_131/bin/javac
+
+​
+대망의! 확인!
+java -version
+하면 이렇게 나온다. java version "1.8.0_131"
+
+
+======================
+3. Hadoop 설치 (nn01 / dn01 / dn02)
+======================
+
+경로 이동 (사실 이미 여기임)
+cd /tmp
+
+현재 경로 확인
+pwd
+
+다운로드
+wget https://archive.apache.org/dist/hadoop/common/hadoop-2.7.7/hadoop-2.7.7.tar.gz
+시간이 좀 걸린다.
+쉬는시간~
+
+다운이 잘 되었는지 확인
+ls
+
+압축풀기
+tar -xvzf hadoop-2.7.7.tar.gz
+
+압축풀기가 잘 되었는지 확인
+ls
+
+디렉토리 여러개 한번에 생성
+mkdir -p /opt/hadoop/2.7.7
+
+잘 만들어졌나 확인
+ls /opt/hadoop/
+
+이동!
+mv hadoop-2.7.7/* /opt/hadoop/2.7.7/
+
+이동이 잘 되었나 확인
+ls /opt/hadoop/2.7.7/
+
+심볼릭 링크 생성
+ln -s /opt/hadoop/2.7.7 /opt/hadoop/current
+
+심볼릭 링크가 잘 생성되었나 확인
+ll /opt/hadoop/
+
+======================
+설치 완료!
+설정 시작!
+======================
+
+기본자동설정된 계정
+root / vagrant
+vagrant / vagrant
+
+계정추가 + 
+hadoop / hadoop
+
+root 계정으로 설치하고, hadoop 계정에 권한을 위임해준다.
+
+======================
+4. Hadoop 사용자(계정) 추가
+======================
+​
+계정 만들기
+useradd hadoop
+
+비밀번호 만들기
+passwd hadoop
+( 비밀번호도 hadoop 으로 - 비밀번호 입력시는 글자표시 안됨 )
+
+소유자가 누구인지 확인
+ll /opt
+하둡, jdk, protobuf 가 있는데, 소유자 현재 root
+
+소유자 변경 chown
+chown -R hadoop:hadoop /opt/hadoop/ 
+( 루트에서 만든 파일의 권한을 hadoop에게 권함)
+
+소유자가 변경되었는지 확인
+ll /opt
+소유자가 hadoop 으로 되어있다.
+
+★ [[ multiExec 풀어주세요! ]] ★
+
+다 풀고, 각각
+su - hadoop
+으로 계정 변경해주세요
+
+근데 su - root 는 안 된다.
+
+로그아웃 해주세요
+logout
+(맨 처음에 루트계정에서 하둡으로 들어왔기 때문에, 로그아웃 하면 root계정이 나온다.)
+
+vim /etc/pam.d/su
+(vi 에디터는 멀티모드가 잘 안 되서, 각자 따로 해주어야 합니다!)
+
+esc : set nu
+esc i
+10 , 11, 12 라인을 앞에 # 붙여서 주석처리해주세요
+:wq
+
+반드시 다시 들어가서 확인
+vim /etc/pam.d/su
+
+주석 되어있는거 확인하고
+:wq
+
+이제
+su - hadoop
+su - root
+vagrant
+하면 계정 변경이 된다!
+
+★ [[ multiExec 로 들어와주세요! ]] ★
+
+세 계정 전부 
+su - hadoop
+hadoop 계정으로 들어와주세요
+
+
+======================
+5. 자바 및 Hadoop 환경 변수 추가
+======================
+
+숨김폴더 확인
+ls -a
+
+설정파일 vi 에디터로 접근
+vi ~/.bash_profile
+
+★ [[ multiExec 풀어주세요! ]] ★
+( 설정파일 수정할 때는 MultiExe 보다 하나씩 하는 것이 나을 수도 있다 )
+
+아랫 부분에 이거 추가
+
+#### HADOOP 2.7.7 start ############
+
+PATH=$PATH:$HOME/bin
+
+export HADOOP_HOME=/opt/hadoop/current
+
+export PATH=$PATH:$HADOOP_HOME/bin
+
+export PATH=$PATH:$HADOOP_HOME/sbin
+
+#### HADOOP 2.7.7end############
+
+
+#### JAVA 1.8.0 start#############
+
+export JAVA_HOME=/opt/jdk/current
+
+export PATH=$PATH:$JAVA_HOME/bin
+
+#### JAVA 1.8.0 end##############
+
+
+복사한 다음에, vi 에디터에서 마우스 오른쪽 버튼눌러서 paste
+
+:wq
+
+반드시 다시 들어가서 확인
+vi ~/.bash_profile
+
+잘 되어있는거 확인하고
+:wq
+
+★ [[ multiExec 로 들어와주세요! ]] ★
+
+★ 설정파일 적용! ★
+source ~/.bash_profile
+
+자바 버전 확인
+java -version
+
+hadoop 버전 확인
+hadoop version
+
+======================
+6. 자바가 잘 되는지 확인
+======================
+
+★ [[ multiExec 풀어주세요! ]] ★
+
+자바가 잘 되는지 구동확인 해볼거에여
+
+mkdir tmp
+cd tmp
+
+자바 파일 하나 만들구
+vim Hello.java
+
+esc i
+
+아래 복사해서, 에디터에서 마우스 오른쪽 눌러서 paste
+
+public class Hello{
+	public static void main(String [] args){
+		System.out.println("HELLO");
+	}
+}
+
+저장하고 나가기
+esc :wq
+
+
+cat Hello.java	: 확인해보구
+ 
+javac Hello.java	: 컴파일 돌려주고 (아무것도 안 떴으면 오류 없는거!)
+
+java Hello	: 자바파일 실행!
+
+
+다 하고 
+cd ~
+홈으로 돌아옵니다.
+
+
+======================
+7. 비밀번호없이 각노드를 접속할 수 있도록 공개키 공유(SSH)
+======================
+
+MobaXterm에서 안 된다.
+Oracle VM VirtualBox 에서 nn01, dn01 , dn02에서 각각 해줘야해요~!
+
+===========
+Oracle VM VirtualBox
+===========
+
+vi /etc/hosts
+
+세 줄 한번에 지우기
+esc 3 dd
+
+esc i
+
+192.168.56.101 nn01
+192.168.56.102 dn01
+192.168.56.103 dn02
+
+esc :wq
+
+하고나고 꼭 확인
+vi /etc/hosts
+esc :wq
+
+다시 MobaXterm으로 돌아옵니다!
+
+===========
+MobaXterm
+===========
+
+★ [[ multiExec 로 들어와주세요! ]] ★
+
+cd ~ 
+홈 상태에서
+
+키를 만든다.
+ssh-keygen
+하고
+
+엔터 4번
+
+하면
+별표 안에 각자의 키 값이 나온다.
+
+
+ssh-copy-id hadoop@nn01
+yes
+hadoop
+
+ssh-copy-id hadoop@dn01
+yes
+hadoop
+
+ssh-copy-id hadoop@dn02
+yes
+hadoop
+
+
+(만약에 하다가 잘 안 되면 다시 ssh-keygen 이거로 키 만드는 것 부터 다시 하고, overwrite로 해주세요)
+
+
+테스트!
+
+★ [[ multiExec 풀어주세요! ]] ★
+nn01 에서 
+
+ssh dn01
+하고 되는 거 보고
+
+ssh dn02
+하고 되는 거 보고
+​	
+logout
+로그아웃 한번 하면 dn01 이 되고
+
+logout
+로그아웃 한번 더 하면 nn01 이 된다.
+
+다시 nn01 로 되었으면
+
+★ [[ multiExec 로 들어와주세요! ]] ★
+
+
+======================
+8. Hadoop 설정 ( nn01  dn01  dn02 전부!)
+======================
+
+한번에 vi 에디터 열기
+vi /opt/hadoop/current/etc/hadoop/core-site.xml
+
+
+★ [[ multiExec 풀어주세요! ]] ★
+
+esc i 
+
+아래 내용 추가
+
+<configuration>
+
+<property>
+
+<name>fs.defaultFS</name>
+
+<value>hdfs://nn01:9000</value>
+
+</property>
+
+</configuration>
+
+추가했으면
+
+저장하고 나가기
+esc :wq
+
+하고 항상 다시 확인
+vi /opt/hadoop/current/etc/hadoop/core-site.xml
+esc :wq
+
+
+★ [[ multiExec 로 들어와주세요! ]] ★
+
+한번에 vi 에디터 열기
+vi /opt/hadoop/current/etc/hadoop/hdfs-site.xml
+
+★ [[ multiExec 풀어주세요! ]] ★
+
+esc i 
+
+아래 내용 추가
+
+<configuration>
+<property>
+<name>dfs.replication</name>
+<value>1</value>
+</property>
+<property>
+<name>dfs.namenode.http-address</name>
+<value>nn01:50070</value>
+</property>
+<property>
+<name>dfs.namenode.secondary.http-address</name>
+<value>nn01:50090</value>
+</property>
+<property>
+<name>dfs.namenode.name.dir</name>
+<value>file:/home/hadoop/hadoop_data/hdfs/namenode</value>
+</property>
+<property>
+<name>dfs.datanode.data.dir</name>
+<value>file:/home/hadoop/hadoop_data/hdfs/datanode</value>
+</property>
+<property>
+<name>dfs.namenode.checkpoint.dir</name>
+<value>file:/home/hadoop/hadoop_data/hdfs/namesecondary</value>
+</property>
+<property>
+<name>dfs.webhdfs.enabled</name>
+<value>true</value>
+</property>
+</configuration>
+
+
+추가했으면
+
+저장하고 나가기
+esc :wq
+
+하고 항상 다시 확인
+vi /opt/hadoop/current/etc/hadoop/hdfs-site.xml
+esc :wq
+
+★ [[ multiExec 로 들어와주세요! ]] ★
+
+한번에 vi 에디터 열기
+vi /opt/hadoop/current/etc/hadoop/yarn-site.xml
+
+★ [[ multiExec 풀어주세요! ]] ★
+
+esc i 
+
+아래 내용 추가
+
+<configuration>
+
+<property>
+
+<name>yarn.nodemanager.aux-services</name>
+
+<value>mapreduce_shuffle</value>
+
+</property>
+
+<property>
+
+<name>yarn.nodemanager.aux-services.mapreduce.shuffle.class</name>
+
+<value>org.apache.hadoop.mapred.ShuffleHandler</value>
+
+</property>
+
+<property>
+
+<name>yarn.resourcemanager.scheduler.address</name>
+
+<value>nn01:8030</value>
+
+</property>
+
+<property>
+
+<name>yarn.resourcemanager.resource-tracker.address</name>
+
+<value>nn01:8031</value>
+
+</property>
+
+<property>
+
+<name>yarn.resourcemanager.address</name>
+
+<value>nn01:8032</value>
+
+</property>
+
+<property>
+
+<name>yarn.resourcemanager.hostname</name>
+
+<value>nn01</value>
+
+</property>
+
+</configuration>
+
+추가했으면
+
+저장하고 나가기
+esc :wq
+
+하고 항상 다시 확인
+vi /opt/hadoop/current/etc/hadoop/yarn-site.xml
+esc :wq
+
+★ [[ multiExec 로 들어와주세요! ]] ★
+
+ cp /opt/hadoop/current/etc/hadoop/mapred-site.xml.template /opt/hadoop/current/etc/hadoop/mapred-site.xml
+
+
+한번에 vi 에디터 열기
+vi /opt/hadoop/current/etc/hadoop/mapred-site.xml
+
+★ [[ multiExec 풀어주세요! ]] ★
+
+esc i 
+
+아래 내용 추가
+
+<configuration>
+
+<property>
+
+<name>mapreduce.framework.name</name>
+
+<value>yarn</value>
+
+</property>
+
+<property>
+
+<name>mapreduce.jobtracker.hosts.exclude.filename</name>
+
+<value>$HADOOP_HOME/etc/hadoop/exclude</value>
+
+</property>
+
+<property>
+
+<name>mapreduce.jobtracker.hosts.filename</name>
+
+<value>$HADOOP_HOME/etc/hadoop/include</value>
+
+</property>
+
+</configuration>
+
+추가했으면
+
+저장하고 나가기
+esc :wq
+
+하고 항상 다시 확인
+vi /opt/hadoop/current/etc/hadoop/mapred-site.xml
+esc :wq
+
+★ [[ multiExec 로 들어와주세요! ]] ★
+
+한번에 vi 에디터 열기
+vi /opt/hadoop/current/etc/hadoop/masters
+
+★ [[ multiExec 풀어주세요! ]] ★
+
+esc i 
+
+아래 내용 추가
+
+nn01
+
+추가했으면
+
+저장하고 나가기
+esc :wq
+
+하고 항상 다시 확인
+vi /opt/hadoop/current/etc/hadoop/masters
+esc :wq
+
+★ [[ multiExec 로 들어와주세요! ]] ★
+
+한번에 vi 에디터 열기
+vi /opt/hadoop/current/etc/hadoop/slaves
+
+★ [[ multiExec 풀어주세요! ]] ★
+
+esc i 
+
+localhost 부분 지우고
+
+아래 내용 추가
+
+dn01
+dn02
+
+추가했으면
+
+저장하고 나가기
+esc :wq
+
+하고 항상 다시 확인
+vi /opt/hadoop/current/etc/hadoop/slaves
+esc :wq
+
+★ [[ multiExec 로 들어와주세요! ]] ★
+
+한번에 vi 에디터 열기
+vi /opt/hadoop/current/etc/hadoop/hadoop-env.sh
+
+★ [[ multiExec 풀어주세요! ]] ★
+
+아래 해당 부분 수정 
+# The java implementation to use.
+export JAVA_HOME=/opt/jdk/current
+
+수정했으면
+
+저장하고 나가기
+esc :wq
+
+하고 항상 다시 확인
+vi /opt/hadoop/current/etc/hadoop/hadoop-env.sh
+esc :wq
+
+★ [[ multiExec 로 들어와주세요! ]] ★
+
+한번에 vi 에디터 열기
+vi /opt/hadoop/current/etc/hadoop/yarn-env.sh
+
+★ [[ multiExec 풀어주세요! ]] ★
+
+아래 해당 부분 수정 
+# some Java parameters
+export JAVA_HOME=/opt/jdk/current
+
+수정했으면
+
+저장하고 나가기
+esc :wq
+
+하고 항상 다시 확인
+vi /opt/hadoop/current/etc/hadoop/yarn-env.sh
+esc :wq
+
+
+★ [[ nn01 ]] ★
+
+mkdir -p ~/hadoop_data/hdfs/namenode
+mkdir -p ~/hadoop_data/hdfs/namesecondary
+
+★ [[ dn01 ]] ★
+
+mkdir -p ~/hadoop_data/hdfs/datanode
+
+★ [[ dn02 ]] ★
+
+mkdir -p ~/hadoop_data/hdfs/datanode
+
+★ [[ nn01 ]] ★
+
+hadoop namenode -format
+start-all.sh
+
+★ [[ multiExec 로 들어와주세요! ]] ★
+
+jps
+
+
+
+
+윈도우 웹 브라우저 ) 관리자
+http://192.168.56.101:50070/
+여기서 상단 Utilities - Browse Directory
+
+http://192.168.56.101:8088/
+어떤 노드가 무슨 작업을 얼만큼 하고 있고 죽었고 구동중이고, 메모리 사용량 그런거 볼 수 있다.
+
+
+★ [[ multiExec 풀어주세요! ]] ★
+
+★ [[ nn01 ]] ★
+hdfs dfs -mkdir /input 	: 디렉토리 생성
+hdfs dfs -ls -R /		: 만든 디렉토리 확인
+
+http://192.168.56.101:50070/	: 확인
+http://192.168.56.101:8088/	: 확인
+
+
+◎ hdfs 	   : 하둡 분산 작업 시스템
+▼ hdfs 명령어
+hdfs dfs -ls -R /					: 디렉토리 확인
+hdfs dfs -mkdir /input 				: input 디렉토리 생성
+hdfs dfs -put /opt/hadoop/current/NOTICE.txt /input	: 복사(로컬에서 하둡으로)
+hdfs dfs -ls /input					: input 디렉토리 확인
+http://192.168.56.101:50070/				: input 눌러서 NOTICE.txt 뜨나 확인 
+hadoop jar /opt/hadoop/current/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.7.jar wordcount /input /output
+						: input 내용 output 에 옮기기
+hdfs dfs -ls /output				: output 디렉토리 확인
+hdfs dfs -cat /output/part-r-00000/			: 이 파일의 내용 보여주세요
+hdfs dfs -rm -r /output				: output 지우기
+
+
+
+**************************************************
+하둡 종료
+**************************************************
+★ [[ nn01 ]] ★
+stop-all.sh
+**************************************************
+하둡 시작
+**************************************************
+★ [[ nn01 ]] ★
+start-all.sh
+**************************************************
