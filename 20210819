@@ -1,0 +1,468 @@
+===========================================
+하이브 설치
+===========================================
+nn01은 너무 바빠서, 나머지 기타 등등은 dn01 에 깔꺼다!
+
+
+[ dn01 노드의 root 계정에서 ]
+
+1. Hive 설치 ( 버전이 계속 변경된다 : 2.3.9 버전 - 2021.07 )
+
+★ 주의! hadoop 계정 말고, root 계정 ★
+
+경로 변경
+cd /tmp
+
+다운로드
+wget https://archive.apache.org/dist/hive/hive-2.3.8/apache-hive-2.3.8-bin.tar.gz
+시간 좀 걸림
+
+압축풀기
+tar xzvf apache-hive-2.3.8-bin.tar.gz
+
+확인 
+ls
+
+mkdir -p /opt/hive/2.3.8
+
+mv apache-hive-2.3.8-bin/* /opt/hive/2.3.8/
+
+심볼릭 링크 생성
+ln -s /opt/hive/2.3.8 /opt/hive/current
+
+목록 보기
+ls /opt
+
+목록 자세히보기 ( 앞에 d 로 되어있다 )
+ls -l /opt
+
+목록 자세히보기 ( 앞에 d 하나, l 하나 해서 두개 있다. )
+ls -l /opt/hive
+
+이거는 생략가능
+cd /opt/hive/current/
+
+
+2. Hive 폴더 접근 권한 설정
+
+chmod -R 775 /opt/hive/2.3.8/
+
+확인
+ls -l /opt/hive
+
+소유권 이전. 루트에서 하둡에게
+chown -R hadoop:hadoop /opt/hive/
+
+확인
+ls -l /opt/hive
+
+
+
+3. Hadoop 계정으로 전환
+
+su - hadoop
+
+
+
+4. HIVE 환경 변수 추가
+
+vi ~/.bash_profile
+
+
+
+#### HIVE 2.3.7 #######################
+export HIVE_HOME=/opt/hive/current
+export PATH=$PATH:$HIVE_HOME/bin
+export CLASSPATH=.:${JAVA_HOME}/lib:${JREHOME}/lib:/opt/hive/current/lib
+#### HIVE 2.3.7 #######################
+
+
+
+적용
+source .bash_profile
+
+
+
+
+
+
+5. HIVE 설정 파일 복사
+
+HIVE 환경설정파일 복사본 만들기~
+
+cp /opt/hive/current/conf/hive-env.sh.template /opt/hive/current/conf/hive-env.sh
+
+cp /opt/hive/current/conf/hive-default.xml.template /opt/hive/current/conf/hive-site.xml
+
+
+
+
+
+6. HIVE 설정 파일 수정 ( 해당 부분을 찾아서 수정 - 제발 오타 확인!!!!! )
+
+
+첫번째 복사했던 그 파일 찾아서 열기
+vi /opt/hive/current/conf/hive-env.sh
+
+거의 다 주석인데
+이 부분 복사! 해서 
+
+HADOOP_HOME=/opt/hadoop/current
+
+넣어주기
+
+그 다음 여기가 관건
+vi /opt/hive/current/conf/hive-site.xml
+
+파일이 5959 줄 만큼 있다.ㅋㅋ
+수정하려면 정신 차리고 하자!
+
+행번호 토굴 : 
+esc :set nu
+esc :set number
+
+원하는 것 찾기 : 
+esc /원하는것
+
+<name>값으로 찾은 다음에
+<value>값 수정해주기
+
+★ 545 줄 ★ 
+
+<property>
+
+<name>javax.jdo.option.ConnectionURL</name>
+
+<value>jdbc:mysql://192.168.56.102:3306/hive?createDatabaseIfNotExist=true</value>
+
+<description>JDBC connect string for a JDBC metastore</description>
+
+</property>
+
+★ 1020 줄 ★ 
+
+<property>
+
+<name>javax.jdo.option.ConnectionDriverName</name>
+
+<value>com.mysql.jdbc.Driver</value>
+
+<description>Driver class name for a JDBC metastore</description>
+
+</property>
+
+★ 1045 줄 ★ 
+
+<property>
+
+<name>javax.jdo.option.ConnectionUserName</name>
+
+<value>hive</value>
+
+<description>username to use against metastore database</description>
+
+</property>
+
+★ 530 줄 ★ 
+
+<property>
+
+<name>javax.jdo.option.ConnectionPassword</name>
+
+<value>hive</value>
+
+<description>password to use against metastore database</description>
+
+</property>
+
+★ 75 줄 ★ 
+
+<property> 
+
+<name>hive.exec.local.scratchdir</name>
+
+<value>/home/hadoop/iotmp</value>
+
+<description>Local scratch space for Hive jobs</description>
+
+</property>
+
+★ 80 줄 ★ 
+
+<property>
+
+<name>hive.downloaded.resources.dir</name>
+
+<value>/home/hadoop/iotmp</value>
+
+<description>Temporary local directory for added resources in the remote file system.</description>
+
+</property>
+
+★ 1195 줄 ★ 
+
+<property>
+
+<name>hive.cli.print.current.db</name>
+
+<value>true</value>
+
+<description>Whether to include the current database in the Hive prompt.</description>
+
+</property>
+
+
+
+
+7. HIVE 관련 디렉토리 생성 및 권한 변경
+
+디렉토리 생성
+mkdir -p /home/hadoop/iotmp
+
+잘 만들어졌는지, 그리고 권한 확인
+ll
+
+권한변경
+chmod -R 775 /home/hadoop/iotmp/
+
+
+하둡 설치 끝
+
+이제! 
+mySQL 이나 mariaDB 가 있어야 한다~!
+
+권한 변경
+su - root
+
+마리아DB 설치
+
+마리아DB 서버와 마리아DB 설치
+yum install mariadb-server mariadb
+
+잘 깔렸는지 확인
+rpm  -qa | grep maria
+
+
+시스템 컨트롤
+
+마리아 DB 서비스 활성시키기
+systemctl enable mariadb.service
+
+마리아 DB 서비스 시작
+systemctl start mariadb.service
+
+구동되는거 확인
+systemctl status mariadb.service
+
+초록색 active (running) 나오면 OK
+
+설치
+mysql_secure_installation
+엔터
+admin1234
+admin1234
+Y n n n Y
+
+mySQL 설정 변경
+vi /etc/my.cnf
+
+맨 위에 두번째 줄에 이거 끼워넣기
+[mysqld]
+bind-address=192.168.56.102
+datadir=/var/lib/mysql
+
+확인
+vi /etc/my.cnf
+
+마리아 DB 서비스 재시작
+systemctl restart mariadb.service
+
+구동되는거 확인
+systemctl status mariadb.service
+
+초록색 active (running) 나오면 OK
+
+마리아DB 시작
+mysql -u root -p
+admin1234
+
+하면 잘 들어와졌다.
+
+데이터베이스 보기
+show databases;
+
+
+하이브라는 계정 만들기
+
+권한주기 (%)
+grant all privileges on *.* to hive@"%" identified by "hive" with grant option;
+
+권한주기 (dn01)
+grant all privileges on *.* to hive@"dn01" identified by "hive" with grant option;
+
+권한 변경한 것 적용
+flush privileges;
+
+데이터베이스 변경
+use mysql
+MariaDB [(none)]> 가 MariaDB [mysql]> 로 변했.
+
+select user, host from user; 
+
+use test;
+
+show tables;
+
+SQL 나가기
+exit;
+
+
+
+하이브 설치 완료
+ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ
+
+
+
+
+8. MYSQL Connector 다운로드 및 hive lib로 복사
+
+계정 hadoop
+
+su - hadoop
+
+[hadoop@dn01 ~]# cd /tmp
+
+[hadoop@dn01 tmp]# wget http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.38.tar.gz
+
+[hadoop@dn01 tmp]# tar xzvf mysql-connector-java-5.1.38.tar.gz
+
+[hadoop@dn01 tmp]# cd mysql-connector-java-5.1.38
+
+확인
+ls
+
+[hadoop@dn01 mysql-connector-java-5.1.38]# mv mysql-connector-java-5.1.38-bin.jar /opt/hive/current/lib/
+
+홈 디렉토리로
+cd ~
+
+확인
+ls /opt/hive/current/lib/
+
+
+
+
+
+9. HIVE 기본 디렉터리 생성 및 권한 추가
+
+디렉토리 생성
+[hadoop@dn01 ~]# hdfs dfs -mkdir /tmp
+
+만약에 저 디렉토리가 이미 있아사 문제가 된다면..
+예전거 지워줍니다.
+hdfs dfs -rm /tmp
+hdfs dfs -rmr /tmp
+그러고 다시 만들죠 뭐 ㅎ
+
+[hadoop@dn01 ~]# hdfs dfs -mkdir -p /user/hive/warehouse
+
+권한 변경
+[hadoop@dn01 ~]# hdfs dfs -chmod -R 777 /tmp
+
+[hadoop@dn01 ~]# hdfs dfs -chmod -R 777 /user/hive/warehouse
+
+
+10. HIVE mysql 기본 스키마 생성
+
+mysql 의 메타스퀘어 초기화 시켜주는 명령어
+[hadoop@dn01 ~]# schematool -initSchema -dbType mysql
+
+( 에러가 발생한다면 기존에 같은 이름의 데이타베이스가 있으니깐
+
+show databases에서 drop database hive; 제거 )
+
+
+
+11. HIVE 접속 
+
+[hadoop@dn01 ~]# hive
+
+( hive 실행전에 메타스토어를 초기화 해야 한다. 즉 10번 하고 hive 명령어 실행 )
+
+잘 들어와졌나요!
+나가는 거
+exit;
+
+다시 hive 접속
+
+hive
+
+show databases;
+
+create database kdatademo;
+
+show databases;
+
+use kdatademo;
+
+
+===============================
+브라우저에서 http://192.168.56.101:50070
+상단 메뉴 > Utitlies > Browser Directory >
+/user/hive/warehouse/kdatademo.db
+확인
+===============================
+
+다시 모바엑스텀 dn01 hadoop hive
+
+테이블 생성
+
+create table customers(
+id bigint,
+name string,
+address string
+);
+
+
+
+테이블 확인
+show tables;
+
+===============================
+브라우저에서 http://192.168.56.101:50070
+상단 메뉴 > Utitlies > Browser Directory >
+/user/hive/warehouse/kdatademo.db/customers
+확인
+===============================
+
+다시 모바엑스텀 dn01 hadoop hive
+
+데이터 넣기
+
+insert into customers values 
+( 1111, "John", "WA" ), 
+( 2222, "Emily", "WA" ), 
+( 3333, "Rick", "WA" ), 
+( 4444, "Jane", "CA" ), 
+( 5555, "Amit", "NJ" ), 
+( 6666, "Nina", "NY" );
+
+select * from customers;
+
+===============================
+브라우저에서 http://192.168.56.101:50070
+상단 메뉴 > Utitlies > Browser Directory >
+/user/hive/warehouse/kdatademo.db/customers
+확인
+===============================
+
+다시 모바엑스텀 
+
+★ dn02 hadoop ★
+
+ssh dn01
+하면 dn01 hadoop 이 된다.
+
+hdfs dfs -ls /user/hive/warehouse/kdatademo.db/customers
+
+hdfs dfs -cat /user/hive/warehouse/kdatademo.db/customers/000000_0
