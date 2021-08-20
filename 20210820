@@ -1,0 +1,141 @@
+[ 스쿱 설치 ]
+
+
+=========
+스쿱 설치
+=========
+
+Sqoop은 1버전이 복잡해서 간소한 것이 2버전이라 1버전으로 
+
+
+[Sqoop1] dn01의 root 계정에서 (@@@@@@)
+
+su - root
+vagrant
+
+1. 스쿱 다운
+
+[root@dn01 ~]# cd /tmp
+
+[root@dn01 tmp]# wget https://archive.apache.org/dist/sqoop/1.4.7/sqoop-1.4.7.bin__hadoop-2.6.0.tar.gz
+
+[root@dn01 tmp]# tar xzvf sqoop-1.4.7.bin__hadoop-2.6.0.tar.gz
+
+[root@dn01 tmp]# mkdir -p /opt/sqoop/1.4.7
+
+[root@dn01 tmp]# mv sqoop-1.4.7.bin__hadoop-2.6.0/* /opt/sqoop/1.4.7/
+
+ls /opt/sqoop/1.4.7/
+
+심볼릭 링크 생성
+[root@dn01 tmp]# ln -s /opt/sqoop/1.4.7 /opt/sqoop/current
+
+심볼릭 링크 생성 확인
+ll /opt/sqoop/
+
+
+
+
+
+2. MYSQL Connector 다운로드 및 sqoop 의 lib로 복사
+
+[root@dn01 ~]# cd /tmp
+
+[root@dn01 tmp]# wget http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.38.tar.gz
+
+[root@dn01 tmp]# tar xzvf mysql-connector-java-5.1.38.tar.gz
+
+[root@dn01 tmp]# cd mysql-connector-java-5.1.38
+
+[root@dn01 mysql-connector-java-5.1.38]# mv mysql-connector-java-5.1.38-bin.jar /opt/sqoop/current/lib/
+
+[root@dn01 mysql-connector-java-5.1.38]# cd ~
+
+[root@dn01]# ls /opt/sqoop/current/lib/
+
+소유주 확인
+ll /opt/sqoop
+(root 로 되어있다.)
+
+3. 스쿱경로를 hadoop 계정에게 소유권변경 
+
+[root@dn01 ~]# chown -R hadoop:hadoop /opt/sqoop/
+
+소유주 확인
+ll /opt/sqoop
+
+
+
+4. hadoop 계정에서 환경변수 설정 
+
+[root@dn01 ~]# su - hadoop
+
+환경변수 설정
+[hadoop@dn01 ~]$ vi ~/.bash_profile
+
+아래 내용 추가해주고
+
+
+#### SQOOP 1.4.7 ######################
+export SQOOP_HOME=/opt/sqoop/current
+export PATH=$PATH:$SQOOP_HOME/bin
+#### SQOOP 1.4.7 ######################
+
+esc :wq
+
+환경변수 수정한 거 적용
+[hadoop@dn01 ~]$ source ~/.bash_profile
+
+
+
+
+
+5. 스쿱 환경설정
+
+[hadoop@dn01 ~]$ cd $SQOOP_HOME/conf
+
+현재 경로 확인
+pwd
+
+목록 보기
+ls
+(초록색으로 된 어떤 샘플 파일이 있다.)
+
+
+
+기존 샘플파일을 바꿔주기
+[hadoop@dn01 conf]$ mv sqoop-env-template.sh sqoop-env.sh
+
+금방 바꿔준 파일 열어보기
+[hadoop@dn01 conf]$ vi sqoop-env.sh
+
+
+export HADOOP_COMMON_HOME=/opt/hadoop/current
+
+export HADOOP_MAPRED_HOME=/opt/hadoop/current
+
+export HIVE_HOME=/opt/hive/current
+
+
+
+
+
+6. 스쿱 확인
+
+[hadoop@dn01 ~]$ sqoop-version
+
+
+
+
+
+7. 스쿱 라이브러리를 하둡에 복사
+
+[hadoop@dn01 ~]$ cd $SQOOP_HOME
+
+확인
+pwd
+
+스쿱 관련 라이브러리 하둡에 넣어줘서, 하둡이 인식할 수 있도록 해 줌
+[hadoop@dn01 current]$ cp sqoop-1.4.7.jar /opt/hadoop/current/share/hadoop/tools/lib/
+
+
